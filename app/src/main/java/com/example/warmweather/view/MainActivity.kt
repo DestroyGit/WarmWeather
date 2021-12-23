@@ -2,6 +2,7 @@ package com.example.warmweather.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.warmweather.R
 import com.example.warmweather.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -12,5 +13,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        if (savedInstanceState == null){
+            supportFragmentManager.beginTransaction().replace(R.id.container,MainFragment.newInstance()).commit()
+        }
     }
 }
