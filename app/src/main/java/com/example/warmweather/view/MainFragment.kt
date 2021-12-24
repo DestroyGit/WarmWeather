@@ -1,5 +1,6 @@
 package com.example.warmweather.view
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import com.example.warmweather.databinding.ActivityMainBinding
 import com.example.warmweather.databinding.FragmentMainBinding
 import com.example.warmweather.viewmodel.AppState
 import com.example.warmweather.viewmodel.MainViewModel
+import com.google.android.material.snackbar.Snackbar
 
 class MainFragment : Fragment() {
 
@@ -33,22 +35,34 @@ class MainFragment : Fragment() {
         // 4. подписываемся на обновления ViewModel LiveData через LifeCycleOwner
         // когда умирвет LifecycleOwner, он передает LifeData об этом, чтобы не было утечек памяти
         // observe - слушатель
-        // Observer - колбэк, на который будут приходить ответы: будем рендерить (randerData) результат изменения LifeData
+        // Observer - колбэк, на который будут приходить ответы: будем рендерить (renderData) результат изменения LifeData
         // !! как только изменение, сразу результат
         viewModel.getLiveData().observe(viewLifecycleOwner, Observer<AppState> { renderData(it) })
         // 6. запускаем эмуляцию/запрашиваем погоду
-        viewModel.getWeatherFromServer()
+        binding.btnShowWeather.setOnClickListener(){
+            viewModel.getWeatherFromServer()
+        }
     }
 
+    @SuppressLint("SetTextI18n")
     fun renderData(appState: AppState){
         when(appState){
             // в случае Error показываем ошибку в виде Toast
-            is AppState.Error -> Toast.makeText(requireContext(),appState.error.message, Toast.LENGTH_SHORT).show()
+            is AppState.Error -> {// Toast.makeText(requireContext(),appState.error.message, Toast.LENGTH_SHORT).show()
+                binding.loadingLayout.visibility = View.GONE
+                Snackbar.make(binding.mainView, "Error", Snackbar.LENGTH_LONG).setAction("Try again"){
+                    viewModel.getWeatherFromServer()
+                }.show()
+            }
             // в случае Loading показываем прогресс загрузки
-            is AppState.Loading -> Toast.makeText(requireContext(),"${appState.progress}", Toast.LENGTH_SHORT).show()
+            is AppState.Loading -> //Toast.makeText(requireContext(),"${appState.progress}", Toast.LENGTH_SHORT).show()
+            binding.loadingLayout.visibility = View.VISIBLE
             // в случае успешного запуска, показываем погоду
-            is AppState.Success -> Toast.makeText(requireContext(),"${appState.weatherData} ${appState.feelsLike}", Toast.LENGTH_SHORT).show()
-
+            is AppState.Success -> {//Toast.makeText(requireContext(),"${appState.weatherData} ${appState.feelsLike}", Toast.LENGTH_SHORT).show()
+                binding.loadingLayout.visibility = View.GONE
+                Snackbar.make(binding.mainView, "${appState.weatherData} ${appState.feelsLike}", Snackbar.LENGTH_LONG).show()
+                binding.resultWeather.text = "${appState.weatherData} ${appState.feelsLike}"
+            }
         }
         // 5. requireContext вместо Context, потмоу что тут есть проверка на null
 //        Toast.makeText(requireContext(),"IT WORKS", Toast.LENGTH_SHORT).show()
