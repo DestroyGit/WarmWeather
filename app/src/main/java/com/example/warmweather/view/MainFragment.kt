@@ -60,8 +60,11 @@ class MainFragment : Fragment() {
             // в случае успешного запуска, показываем погоду
             is AppState.Success -> {//Toast.makeText(requireContext(),"${appState.weatherData} ${appState.feelsLike}", Toast.LENGTH_SHORT).show()
                 binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(binding.mainView, "${appState.weatherData} ${appState.feelsLike}", Snackbar.LENGTH_LONG).show()
-                binding.resultWeather.text = "${appState.weatherData} ${appState.feelsLike}"
+                Snackbar.make(
+                    binding.mainView, "${appState.weatherData.temperature}", Snackbar.LENGTH_LONG
+                ).show()
+                binding.resultWeather.text =
+                    "${appState.weatherData.city.name} ${appState.weatherData.temperature}"
             }
         }
         // 5. requireContext вместо Context, потмоу что тут есть проверка на null
