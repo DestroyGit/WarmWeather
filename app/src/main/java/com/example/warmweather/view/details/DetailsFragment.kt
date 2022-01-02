@@ -1,4 +1,4 @@
-package com.example.warmweather.view
+package com.example.warmweather.view.details
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -6,23 +6,23 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.warmweather.R
-import com.example.warmweather.databinding.ActivityMainBinding
 import com.example.warmweather.databinding.FragmentMainBinding
 import com.example.warmweather.viewmodel.AppState
 import com.example.warmweather.viewmodel.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 
-class MainFragment : Fragment() {
+class DetailsFragment : Fragment() {
 
     var _binding: FragmentMainBinding? = null
     private val binding: FragmentMainBinding
     get(){
         return _binding!!
     }
+
+//    private val adapter = MainFragmentAdapter()
+    private var isRussian = true
 
     private lateinit var viewModel: MainViewModel // создание ссылки на ViewModel
 
@@ -38,9 +38,16 @@ class MainFragment : Fragment() {
         // Observer - колбэк, на который будут приходить ответы: будем рендерить (renderData) результат изменения LifeData
         // !! как только изменение, сразу результат
         viewModel.getLiveData().observe(viewLifecycleOwner, Observer<AppState> { renderData(it) })
-        // 6. запускаем эмуляцию/запрашиваем погоду
-        binding.btnShowWeather.setOnClickListener(){
-            viewModel.getWeatherFromServer()
+
+        binding.mainFragmentFAB.setOnClickListener(){
+            if (isRussian){
+                viewModel.getWeatherFromLocalSourceRus()
+            } else{
+                viewModel.getWeatherFromLocalSourceWorld()
+            }
+
+            // меняем на противоположное значение
+            isRussian != isRussian // ЗАЧЕМ?
         }
     }
 
@@ -49,22 +56,22 @@ class MainFragment : Fragment() {
         when(appState){
             // в случае Error показываем ошибку в виде Toast
             is AppState.Error -> {// Toast.makeText(requireContext(),appState.error.message, Toast.LENGTH_SHORT).show()
-                binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(binding.mainView, "Error", Snackbar.LENGTH_LONG).setAction("Try again"){
-                    viewModel.getWeatherFromServer()
+                binding.mainFragmentLoadingLayout.visibility = View.GONE
+                Snackbar.make(binding.root, "Error", Snackbar.LENGTH_LONG).setAction("Try again"){
+//                    viewModel.getWeatherFromLocalServer()
                 }.show()
             }
             // в случае Loading показываем прогресс загрузки
             is AppState.Loading -> //Toast.makeText(requireContext(),"${appState.progress}", Toast.LENGTH_SHORT).show()
-            binding.loadingLayout.visibility = View.VISIBLE
+            binding.mainFragmentLoadingLayout.visibility = View.VISIBLE
             // в случае успешного запуска, показываем погоду
             is AppState.Success -> {//Toast.makeText(requireContext(),"${appState.weatherData} ${appState.feelsLike}", Toast.LENGTH_SHORT).show()
-                binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(
-                    binding.mainView, "${appState.weatherData.temperature}", Snackbar.LENGTH_LONG
-                ).show()
-                binding.resultWeather.text =
-                    "${appState.weatherData.city.name} ${appState.weatherData.temperature}"
+                binding.mainFragmentLoadingLayout.visibility = View.GONE
+//                Snackbar.make(
+//                    binding.root, "${appState.weatherData.temperature}", Snackbar.LENGTH_LONG
+//                ).show()
+//                binding.resultWeather.text =
+//                    "${appState.weatherData.city.name} ${appState.weatherData.temperature}"
             }
         }
         // 5. requireContext вместо Context, потмоу что тут есть проверка на null
@@ -80,7 +87,7 @@ class MainFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance() = MainFragment()
+        fun newInstance() = DetailsFragment()
     }
 
     override fun onDestroy() {
