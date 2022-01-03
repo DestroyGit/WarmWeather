@@ -29,12 +29,16 @@ class WeatherFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val weather = arguments?.getParcelable<Weather>(WEATHER_KEY)
         if (weather!=null){
-            Snackbar.make(
-                    binding.root, "${weather.temperature}", Snackbar.LENGTH_LONG
-                ).show()
-                binding.resultWeather.text =
-                    "${weather.city.name} ${weather.temperature}"
+            setWeatherData(weather)
         }
+    }
+
+    private fun setWeatherData(weather: Weather) {
+        Snackbar.make(
+            binding.root, "${weather.temperature}", Snackbar.LENGTH_LONG
+        ).show()
+        binding.resultWeather.text =
+            "${weather.city.name} ${weather.temperature}"
     }
 
     override fun onCreateView(

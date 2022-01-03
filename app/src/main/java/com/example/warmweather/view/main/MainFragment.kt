@@ -19,7 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 
 class MainFragment : Fragment(), OnMyItemClickListener {
 
-    var _binding: FragmentMainBinding? = null
+    private var _binding: FragmentMainBinding? = null
     private val binding: FragmentMainBinding
     get(){
         return _binding!!
