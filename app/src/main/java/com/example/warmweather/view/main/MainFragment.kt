@@ -8,12 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.warmweather.R
 import com.example.warmweather.databinding.FragmentMainBinding
+import com.example.warmweather.model.Weather
+import com.example.warmweather.view.details.WEATHER_KEY
+import com.example.warmweather.view.details.WeatherFragment
 import com.example.warmweather.viewmodel.AppState
 import com.example.warmweather.viewmodel.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 
-class MainFragment : Fragment() {
+class MainFragment : Fragment(), OnMyItemClickListener {
 
     var _binding: FragmentMainBinding? = null
     private val binding: FragmentMainBinding
@@ -21,7 +25,7 @@ class MainFragment : Fragment() {
         return _binding!!
     }
 
-    private val adapter = MainFragmentAdapter()
+    private val adapter = MainFragmentAdapter(this)
     private var isRussian = true
 
     private lateinit var viewModel: MainViewModel // создание ссылки на ViewModel
@@ -95,12 +99,26 @@ class MainFragment : Fragment() {
     }
 
     private fun sentRequest(){
-        if (isRussian){
-            viewModel.getWeatherFromLocalSourceRus()
-        } else{
-            viewModel.getWeatherFromLocalSourceWorld()
-        }
         // меняем на противоположное значение
         isRussian = !isRussian
+        if (isRussian){
+            viewModel.getWeatherFromLocalSourceRus()
+            binding.mainFragmentFAB.setImageResource(R.drawable.icon_russia)
+        } else{
+            viewModel.getWeatherFromLocalSourceWorld()
+            binding.mainFragmentFAB.setImageResource(R.drawable.icon_world)
+        }
+    }
+
+    override fun onItemClick(weather: Weather) {
+        // создаем контейнер для передачи данных
+        val bundle = Bundle()
+        bundle.putParcelable(WEATHER_KEY, weather)
+        requireActivity()
+            .supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.container, WeatherFragment.newInstance(bundle))
+            .addToBackStack("")
+            .commit()
     }
 }
