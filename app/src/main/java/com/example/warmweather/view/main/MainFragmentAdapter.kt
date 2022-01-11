@@ -10,17 +10,24 @@ import com.example.warmweather.R
 import com.example.warmweather.model.Weather
 
 // умеет принимать в себя клики val listener: OnMyItemClickListener
-class MainFragmentAdapter(val listener: OnMyItemClickListener): RecyclerView.Adapter<MainFragmentAdapter.MainViewHolder>() {
+class MainFragmentAdapter(val listener: OnMyItemClickListener) :
+    RecyclerView.Adapter<MainFragmentAdapter.MainViewHolder>() {
 
     private var weatherData: List<Weather> = listOf() //пока просто пустой лист, заглушка
 
-    fun setWeather(data:List<Weather>){
+    fun setWeather(data: List<Weather>) {
         this.weatherData = data
         notifyDataSetChanged()
     }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainFragmentAdapter.MainViewHolder{
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): MainFragmentAdapter.MainViewHolder {
         // возвращаем в скобках надутый main_recycler_item
-        return MainViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.main_recycler_item,parent,false))
+        return MainViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.main_recycler_item, parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: MainFragmentAdapter.MainViewHolder, position: Int) {
@@ -32,13 +39,13 @@ class MainFragmentAdapter(val listener: OnMyItemClickListener): RecyclerView.Ada
     }
 
     // переопределяем вьюхолдер
-    inner class MainViewHolder(view: View): RecyclerView.ViewHolder(view){
+    inner class MainViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         //будет вызываться в onBindViewHolder
-        fun bind(weather: Weather){
+        fun bind(weather: Weather) {
             // по умолчанию мы имеем itemView в main_recycler_item
             itemView.findViewById<TextView>(R.id.mainFragmentRecyclerItemTextView).text = weather.city.name
-            itemView.setOnClickListener(){
+            itemView.setOnClickListener() {
                 // Toast.makeText(itemView.context, "It works! ${weather.city.name}",Toast.LENGTH_SHORT).show()
                 listener.onItemClick(weather)
             }

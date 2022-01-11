@@ -21,11 +21,13 @@ class MainFragment : Fragment(), OnMyItemClickListener {
 
     private var _binding: FragmentMainBinding? = null
     private val binding: FragmentMainBinding
-    get(){
-        return _binding!!
-    }
+        get() {
+            return _binding!!
+        }
 
-    private val adapter = MainFragmentAdapter(this)
+    private val adapter: MainFragmentAdapter by lazy {
+        MainFragmentAdapter(this)
+    }
     private var isRussian = true
 
     private val viewModel: MainViewModel by lazy { // создание ссылки на ViewModel
@@ -34,6 +36,7 @@ class MainFragment : Fragment(), OnMyItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initView() // вынесли binding из onViewCreated
 
         // 3. ViewModelProvider - хранилище всех ViewModel, следит, чтобы каждая ViewModel существовала в одном экземпляре
         // если вернуть несуществующий ViewModel, он ее создаст
@@ -45,43 +48,38 @@ class MainFragment : Fragment(), OnMyItemClickListener {
         // Observer - колбэк, на который будут приходить ответы: будем рендерить (renderData) результат изменения LifeData
         // !! как только изменение, сразу результат
         viewModel.getLiveData().observe(viewLifecycleOwner, Observer<AppState> { renderData(it) })
-
-        binding.mainFragmentRecyclerView.adapter = adapter
-
-        binding.mainFragmentFAB.setOnClickListener(){
-            sentRequest()
-        }
-
         viewModel.getWeatherFromLocalSourceRus()
     }
 
     @SuppressLint("SetTextI18n")
-    fun renderData(appState: AppState){
-        when(appState){
-            // в случае Error показываем ошибку в виде Toast
-            is AppState.Error -> {// Toast.makeText(requireContext(),appState.error.message, Toast.LENGTH_SHORT).show()
-                binding.mainFragmentLoadingLayout.visibility = View.GONE
-                Snackbar.make(binding.root, "Error", Snackbar.LENGTH_LONG).setAction("Try again"){
-                    sentRequest()
-                }.show()
-            }
-            // в случае Loading показываем прогресс загрузки
-            is AppState.Loading -> //Toast.makeText(requireContext(),"${appState.progress}", Toast.LENGTH_SHORT).show()
-            binding.mainFragmentLoadingLayout.visibility = View.VISIBLE
-            // в случае успешного запуска, показываем погоду
-            is AppState.Success -> {//Toast.makeText(requireContext(),"${appState.weatherData} ${appState.feelsLike}", Toast.LENGTH_SHORT).show()
-                binding.mainFragmentLoadingLayout.visibility = View.GONE
+    fun renderData(appState: AppState) {
+        with(binding) {
+            when (appState) {
+                // в случае Error показываем ошибку в виде Toast
+                is AppState.Error -> {// Toast.makeText(requireContext(),appState.error.message, Toast.LENGTH_SHORT).show()
+                    mainFragmentLoadingLayout.visibility = View.GONE
+                    Snackbar.make(root, "Error", Snackbar.LENGTH_LONG).setAction("Try again") {
+                        sentRequest()
+                    }.show()
+                }
+                // в случае Loading показываем прогресс загрузки
+                is AppState.Loading -> //Toast.makeText(requireContext(),"${appState.progress}", Toast.LENGTH_SHORT).show()
+                    mainFragmentLoadingLayout.visibility = View.VISIBLE
+                // в случае успешного запуска, показываем погоду
+                is AppState.Success -> {//Toast.makeText(requireContext(),"${appState.weatherData} ${appState.feelsLike}", Toast.LENGTH_SHORT).show()
+                    mainFragmentLoadingLayout.visibility = View.GONE
 
-                adapter.setWeather(appState.weatherData)
+                    adapter.setWeather(appState.weatherData)
 //                Snackbar.make(
 //                    binding.root, "${appState.weatherData.temperature}", Snackbar.LENGTH_LONG
 //                ).show()
 //                binding.resultWeather.text =
 //                    "${appState.weatherData.city.name} ${appState.weatherData.temperature}"
+                }
             }
-        }
-        // 5. requireContext вместо Context, потмоу что тут есть проверка на null
+            // 5. requireContext вместо Context, потмоу что тут есть проверка на null
 //        Toast.makeText(requireContext(),"IT WORKS", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCreateView(
@@ -101,27 +99,46 @@ class MainFragment : Fragment(), OnMyItemClickListener {
         _binding = null
     }
 
-    private fun sentRequest(){
+    private fun sentRequest() {
         // меняем на противоположное значение
-        isRussian = !isRussian
-        if (isRussian){
-            viewModel.getWeatherFromLocalSourceRus()
-            binding.mainFragmentFAB.setImageResource(R.drawable.icon_russia)
-        } else{
-            viewModel.getWeatherFromLocalSourceWorld()
-            binding.mainFragmentFAB.setImageResource(R.drawable.icon_world)
+        with(binding) {
+            isRussian = !isRussian
+            if (isRussian) {
+                viewModel.getWeatherFromLocalSourceRus()
+                mainFragmentFAB.setImageResource(R.drawable.icon_russia)
+            } else {
+                viewModel.getWeatherFromLocalSourceWorld()
+                mainFragmentFAB.setImageResource(R.drawable.icon_world)
+            }
         }
     }
 
     override fun onItemClick(weather: Weather) {
         // создаем контейнер для передачи данных
-        val bundle = Bundle()
-        bundle.putParcelable(WEATHER_KEY, weather)
-        requireActivity()
-            .supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.container, WeatherFragment.newInstance(bundle))
-            .addToBackStack("")
-            .commit()
+
+        // Для чайников ниже, для продвинутых в newInstanceЖ: newInstance(Bundle().apply {putParcelable(WEATHER_KEY, weather))
+//        val bundle = Bundle()
+//        bundle.putParcelable(WEATHER_KEY, weather)
+
+        activity?.run {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.container, WeatherFragment.newInstance( // КАК СДЕЛАТЬ ТАК, ЧТОБЫ ADD ДОБАВЛЯЛ НЕПРОЗРАЧНЫЙ ФОН?
+                    Bundle().apply {
+                        putParcelable(WEATHER_KEY, weather)
+                    }
+                )) //newInstance(bundle) - для чайников версия
+                .addToBackStack("")
+                .commit()
+        }
+    }
+
+    private fun initView() {
+        with(binding) {
+            mainFragmentRecyclerView.adapter = adapter
+            mainFragmentFAB.setOnClickListener() {
+                sentRequest()
+            }
+        }
     }
 }
