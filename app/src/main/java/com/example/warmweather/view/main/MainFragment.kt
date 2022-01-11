@@ -28,14 +28,17 @@ class MainFragment : Fragment(), OnMyItemClickListener {
     private val adapter = MainFragmentAdapter(this)
     private var isRussian = true
 
-    private lateinit var viewModel: MainViewModel // создание ссылки на ViewModel
+    private val viewModel: MainViewModel by lazy { // создание ссылки на ViewModel
+        ViewModelProvider(this).get(MainViewModel::class.java)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // 3. ViewModelProvider - хранилище всех ViewModel, следит, чтобы каждая ViewModel существовала в одном экземпляре
         // если вернуть несуществующий ViewModel, он ее создаст
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        //viewModel = ViewModelProvider(this).get(MainViewModel::class.java) // перенесли выше в lazy
+
         // 4. подписываемся на обновления ViewModel LiveData через LifeCycleOwner
         // когда умирвет LifecycleOwner, он передает LifeData об этом, чтобы не было утечек памяти
         // observe - слушатель

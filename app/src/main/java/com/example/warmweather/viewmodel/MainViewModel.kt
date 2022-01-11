@@ -10,8 +10,12 @@ import java.lang.Thread.sleep
 // Mutable - значит изменяемая LiveData, и даем ему значение MutableLiveData()
 class MainViewModel(
     private val liveData: MutableLiveData<AppState> = MutableLiveData(),
-    private val repositoryImpl: RepositoryImpl = RepositoryImpl()
+
 ):ViewModel() {
+
+    private val repositoryImpl: RepositoryImpl by lazy {
+        RepositoryImpl()
+    }
 
     // 2. посадили livedata
     fun getLiveData():LiveData<AppState>{
