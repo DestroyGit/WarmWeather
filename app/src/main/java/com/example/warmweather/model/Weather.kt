@@ -7,12 +7,16 @@ import kotlinx.android.parcel.Parcelize
 
 // параметрам задаем значения, чтобы в RepositoryImpl срабатывало по умолчанию
 @Parcelize
-data class Weather(val city: City = getDefaultCity(), val temperature: Int = -20, val feelsLike: Int = -25):Parcelable
+data class Weather(
+    val city: City = getDefaultCity(),
+    val temperature: Int = -20,
+    val feelsLike: Int = -25
+) : Parcelable
 
 @Parcelize
-data class City(val name: String, val lat: Double, val lon: Double):Parcelable
+data class City(val name: String, val lat: Double, val lon: Double) : Parcelable
 
-fun getDefaultCity() = City("Moscow",55.33, 37.22)
+fun getDefaultCity() = City("Moscow", 55.33, 37.22)
 
 fun getWorldCities(): List<Weather> {
     return listOf(
