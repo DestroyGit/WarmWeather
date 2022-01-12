@@ -58,9 +58,11 @@ class MainFragment : Fragment(), OnMyItemClickListener {
                 // в случае Error показываем ошибку в виде Toast
                 is AppState.Error -> {// Toast.makeText(requireContext(),appState.error.message, Toast.LENGTH_SHORT).show()
                     mainFragmentLoadingLayout.visibility = View.GONE
-                    Snackbar.make(root, "Error", Snackbar.LENGTH_LONG).setAction("Try again") {
-                        sentRequest()
-                    }.show()
+//                    Snackbar.make(root, "Error", Snackbar.LENGTH_LONG)
+//                        .setAction("Try again") {
+//                            sentRequest()
+//                    }.show()
+                    binding.root.showSnackBarWithAction("Error", "Try again", Snackbar.LENGTH_LONG)
                 }
                 // в случае Loading показываем прогресс загрузки
                 is AppState.Loading -> //Toast.makeText(requireContext(),"${appState.progress}", Toast.LENGTH_SHORT).show()
@@ -68,8 +70,8 @@ class MainFragment : Fragment(), OnMyItemClickListener {
                 // в случае успешного запуска, показываем погоду
                 is AppState.Success -> {//Toast.makeText(requireContext(),"${appState.weatherData} ${appState.feelsLike}", Toast.LENGTH_SHORT).show()
                     mainFragmentLoadingLayout.visibility = View.GONE
-
                     adapter.setWeather(appState.weatherData)
+                    binding.root.showSnackBarWithoutAction("Success", Snackbar.LENGTH_LONG)
 //                Snackbar.make(
 //                    binding.root, "${appState.weatherData.temperature}", Snackbar.LENGTH_LONG
 //                ).show()
@@ -80,6 +82,16 @@ class MainFragment : Fragment(), OnMyItemClickListener {
             // 5. requireContext вместо Context, потмоу что тут есть проверка на null
 //        Toast.makeText(requireContext(),"IT WORKS", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun View.showSnackBarWithoutAction(text: String, length: Int) {
+        Snackbar.make(this, text, length).show()
+    }
+
+    private fun View.showSnackBarWithAction(title: String, text: String, length: Int) {
+        Snackbar.make(this, title, length).setAction(text) {
+            sentRequest()
+        }.show()
     }
 
     override fun onCreateView(
@@ -123,11 +135,12 @@ class MainFragment : Fragment(), OnMyItemClickListener {
         activity?.run {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.container, WeatherFragment.newInstance( // КАК СДЕЛАТЬ ТАК, ЧТОБЫ ADD ДОБАВЛЯЛ НЕПРОЗРАЧНЫЙ ФОН?
-                    Bundle().apply {
-                        putParcelable(WEATHER_KEY, weather)
-                    }
-                )) //newInstance(bundle) - для чайников версия
+                .replace(R.id.container,
+                    WeatherFragment.newInstance( // КАК СДЕЛАТЬ ТАК, ЧТОБЫ ADD ДОБАВЛЯЛ НЕПРОЗРАЧНЫЙ ФОН?
+                        Bundle().apply {
+                            putParcelable(WEATHER_KEY, weather)
+                        }
+                    )) //newInstance(bundle) - для чайников версия
                 .addToBackStack("")
                 .commit()
         }

@@ -37,12 +37,17 @@ class WeatherFragment : Fragment() {
 
     private fun setWeatherData(weather: Weather) {
         with(binding) {
-            Snackbar.make(
-                root, "${weather.temperature}", Snackbar.LENGTH_LONG
-            ).show()
+            binding.root.showSnackBar("${weather.temperature}", Snackbar.LENGTH_LONG)
+//            Snackbar.make(
+//                root, "${weather.temperature}", Snackbar.LENGTH_LONG
+//            ).show()
             resultWeather.text =
                 "${weather.city.name} ${weather.temperature}"
         }
+    }
+
+    private fun View.showSnackBar(text: String, length: Int) {
+        Snackbar.make(this, text, length).show()
     }
 
     override fun onCreateView(
