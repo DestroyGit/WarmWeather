@@ -1,17 +1,20 @@
 package com.example.warmweather.view.details
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.warmweather.databinding.FragmentWeatherBinding
 import com.example.warmweather.model.Weather
+import com.example.warmweather.model.WeatherDTO
+import com.example.warmweather.utils.WeatherLoader
 import com.google.android.material.snackbar.Snackbar
 
 const val WEATHER_KEY = "WEATHER_KEY"
 
-class WeatherFragment : Fragment() {
+class WeatherFragment : Fragment(), WeatherLoader.OnWeatherLoaded {
 
     private var _binding: FragmentWeatherBinding? = null
     private val binding: FragmentWeatherBinding
@@ -19,6 +22,9 @@ class WeatherFragment : Fragment() {
             return _binding!!
         }
 
+    lateinit var localWeather: Weather
+
+    private val weatherLoader = WeatherLoader(this)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -28,21 +34,24 @@ class WeatherFragment : Fragment() {
 //            setWeatherData(weather)
 //        }
         // ниже реализация через let/run
-        arguments?.let {
-            it.getParcelable<Weather>(WEATHER_KEY)?.run {
-                setWeatherData(this)
+        arguments?.let { it ->
+            it.getParcelable<Weather>(WEATHER_KEY)?.let {
+                localWeather = it
+                weatherLoader.loadWeather(it.city.lat, it.city.lon)
             }
         }
     }
 
-    private fun setWeatherData(weather: Weather) {
+    private fun setWeatherData(weatherDTO: WeatherDTO) {
+        with(localWeather){
+            binding.cityName.text = city.name
+        }
+
         with(binding) {
-            binding.root.showSnackBar("${weather.temperature}", Snackbar.LENGTH_LONG)
-//            Snackbar.make(
-//                root, "${weather.temperature}", Snackbar.LENGTH_LONG
-//            ).show()
-            resultWeather.text =
-                "${weather.city.name} ${weather.temperature}"
+            temperature.text = "${weatherDTO.fact.temp}"
+            feelsLike.text = "${weatherDTO.fact.feelsLike}"
+            root.showSnackBar("${weatherDTO.fact.temp}", Snackbar.LENGTH_LONG)
+
         }
     }
 
@@ -72,5 +81,16 @@ class WeatherFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    override fun onLoaded(weatherDTO: WeatherDTO?) {
+        weatherDTO?.let {
+            setWeatherData(weatherDTO)
+        }
+        Log.d("","")
+    }
+
+    override fun onFailed() {
+        TODO("Not yet implemented")
     }
 }

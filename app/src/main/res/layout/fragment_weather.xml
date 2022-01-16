@@ -13,18 +13,27 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnShowWeather"
+        <TextView
+            android:id="@+id/cityName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/show_weather"/>
+            android:textSize="40sp"
+            tools:text="Москва"/>
 
         <TextView
-            android:id="@+id/resultWeather"
+            android:id="@+id/temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="30sp"
-            tools:text="Москва -20"/>
+            android:textSize="40sp"
+            tools:text="-20"/>
+
+        <TextView
+            android:id="@+id/feelsLike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            tools:text="-40"/>
+
     </LinearLayout>
 
     <FrameLayout
