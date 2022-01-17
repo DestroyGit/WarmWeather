@@ -36,9 +36,9 @@ class WeatherLoader(private val onWeatherLoaded: OnWeatherLoaded) {
                     convertBufferToResult(bufferedReader),
                     WeatherDTO::class.java
                 )
-//                handlerMainUI.post{
+                handlerMainUI.post{
                     onWeatherLoaded.onLoaded(weatherDTO)
-//                }
+                }
             } catch (e: Exception){
                 Log.d("MISTAKE", "catch")
                 handlerMainUI.post(){
