@@ -135,7 +135,7 @@ class MainFragment : Fragment(), OnMyItemClickListener {
         activity?.run {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.container,
+                .add(R.id.container,
                     WeatherFragment.newInstance( // КАК СДЕЛАТЬ ТАК, ЧТОБЫ ADD ДОБАВЛЯЛ НЕПРОЗРАЧНЫЙ ФОН?
                         Bundle().apply {
                             putParcelable(WEATHER_KEY, weather)
