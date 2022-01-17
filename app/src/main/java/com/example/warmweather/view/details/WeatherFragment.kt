@@ -6,11 +6,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.example.warmweather.databinding.FragmentWeatherBinding
 import com.example.warmweather.model.Weather
 import com.example.warmweather.model.WeatherDTO
 import com.example.warmweather.utils.WeatherLoader
 import com.google.android.material.snackbar.Snackbar
+import java.lang.Exception
 
 const val WEATHER_KEY = "WEATHER_KEY"
 
@@ -87,10 +89,11 @@ class WeatherFragment : Fragment(), WeatherLoader.OnWeatherLoaded {
         weatherDTO?.let {
             setWeatherData(weatherDTO)
         }
-        Log.d("","")
     }
 
-    override fun onFailed() {
-        TODO("Not yet implemented")
+    override fun onFailed(e: Exception) {
+//        binding.root.showSnackBar("fail",Snackbar.LENGTH_SHORT)
+        Log.d("MISTAKE", "${e.message}")
+        Toast.makeText(requireActivity(),"ERROR: ${e.message}",Toast.LENGTH_SHORT).show()
     }
 }
