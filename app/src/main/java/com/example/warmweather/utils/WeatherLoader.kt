@@ -3,6 +3,7 @@ package com.example.warmweather.utils
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.example.warmweather.BuildConfig
 import com.example.warmweather.model.WeatherDTO
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -25,7 +26,7 @@ class WeatherLoader(private val onWeatherLoaded: OnWeatherLoaded) {
                     readTimeout = 2000
                     addRequestProperty(
                         "X-Yandex-API-Key",
-                        "84a54a9d-62d9-497c-b446-c28a4d96ef39"
+                        BuildConfig.WEATHER_API_KEY
                     )
                 }
 
